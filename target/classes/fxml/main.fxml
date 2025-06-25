@@ -1,0 +1,151 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.canvas.Canvas?>
+
+<BorderPane xmlns="http://javafx.com/javafx/11.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.drawing.view.MainViewController">
+   <top>
+      <MenuBar BorderPane.alignment="CENTER">
+        <menus>
+          <Menu mnemonicParsing="false" text="Fichier">
+            <items>
+              <MenuItem fx:id="newMenuItem" mnemonicParsing="false" onAction="#onNewDrawing" text="Nouveau" />
+              <MenuItem fx:id="saveMenuItem" mnemonicParsing="false" onAction="#onSaveAsImage" text="Sauvegarder" />
+              <MenuItem fx:id="loadMenuItem" mnemonicParsing="false" onAction="#onLoadDrawing" text="Charger" />
+              <SeparatorMenuItem mnemonicParsing="false" />
+              <MenuItem fx:id="exitMenuItem" mnemonicParsing="false" onAction="#onExit" text="Quitter" />
+            </items>
+          </Menu>
+          <Menu mnemonicParsing="false" text="Édition">
+            <items>
+              <MenuItem fx:id="undoMenuItem" mnemonicParsing="false" onAction="#onUndo" text="Annuler" />
+              <MenuItem fx:id="redoMenuItem" mnemonicParsing="false" onAction="#onRedo" text="Rétablir" />
+              <SeparatorMenuItem mnemonicParsing="false" />
+              <MenuItem fx:id="clearMenuItem" mnemonicParsing="false" onAction="#onClearDrawing" text="Effacer tout" />
+            </items>
+          </Menu>
+          <Menu mnemonicParsing="false" text="Outils">
+            <items>
+              <MenuItem fx:id="consoleLogMenuItem" mnemonicParsing="false" onAction="#onConsoleLogging" text="Log Console" />
+              <MenuItem fx:id="fileLogMenuItem" mnemonicParsing="false" onAction="#onFileLogging" text="Log Fichier" />
+              <MenuItem fx:id="dbLogMenuItem" mnemonicParsing="false" onAction="#onDatabaseLogging" text="Log Base de données" />
+              <MenuItem fx:id="shortestPathMenuItem" mnemonicParsing="false" onAction="#onShortestPathMenu" text="Calculer le plus court chemin" />
+            </items>
+          </Menu>
+        </menus>
+      </MenuBar>
+   </top>
+   <left>
+      <VBox prefWidth="200.0" spacing="10.0" BorderPane.alignment="CENTER">
+         <children>
+            <Label text="Palette d'outils" />
+            <Separator prefWidth="200.0" />
+            
+            <!-- Sélection de forme -->
+            <Label text="Formes:" />
+            <VBox fx:id="shapeButtonsContainer" spacing="5.0">
+               <children>
+                  <ToggleButton fx:id="rectangleButton" mnemonicParsing="false" onAction="#onShapeSelected" prefWidth="180.0" text="Rectangle" userData="RECTANGLE" />
+                  <ToggleButton fx:id="circleButton" mnemonicParsing="false" onAction="#onShapeSelected" prefWidth="180.0" text="Cercle" userData="CIRCLE" />
+                  <ToggleButton fx:id="lineButton" mnemonicParsing="false" onAction="#onShapeSelected" prefWidth="180.0" text="Ligne" userData="LINE" />
+                  <ToggleButton fx:id="ellipseButton" mnemonicParsing="false" onAction="#onShapeSelected" prefWidth="180.0" text="Ellipse" userData="ELLIPSE" />
+                  <ToggleButton fx:id="triangleButton" mnemonicParsing="false" onAction="#onShapeSelected" prefWidth="180.0" text="Triangle" userData="TRIANGLE" />
+                  <!-- Graph tools -->
+                  <ToggleButton fx:id="nodeButton" mnemonicParsing="false" onAction="#onShapeSelected" prefWidth="180.0" text="Noeud (Graphe)" userData="NODE" />
+                  <ToggleButton fx:id="edgeButton" mnemonicParsing="false" onAction="#onShapeSelected" prefWidth="180.0" text="Arête (Graphe)" userData="EDGE" />
+               </children>
+            </VBox>
+            
+            <Separator prefWidth="200.0" />
+            <!-- Propriétés -->
+            <Label text="Propriétés:" />
+            <Label text="Couleur:" />
+            <ColorPicker fx:id="colorPicker" onAction="#onColorChanged" prefWidth="180.0" />
+            <Label text="Épaisseur:" />
+            <Slider fx:id="strokeWidthSlider" max="10.0" min="1.0" onMouseReleased="#onStrokeWidthChanged" prefWidth="180.0" value="2.0" />
+            <Label fx:id="strokeWidthLabel" text="2.0" />
+            <CheckBox fx:id="fillCheckBox" mnemonicParsing="false" onAction="#onFillModeChanged" text="Remplir" />
+
+            <!-- Node selection for shortest path -->
+            <HBox spacing="8">
+                <Label text="Node A ID:"/>
+                <TextField fx:id="nodeAField" prefWidth="40" />
+                <Label text="Node B ID:"/>
+                <TextField fx:id="nodeBField" prefWidth="40" />
+            </HBox>
+
+            <!-- Dimensions dynamiques selon la forme sélectionnée -->
+            <VBox fx:id="dimensionBox" spacing="5.0" visible="false">
+                <!-- Rectangle -->
+                <HBox fx:id="rectangleDimensions" spacing="5.0" visible="false">
+                    <Label text="Largeur:" />
+                    <TextField fx:id="rectWidthField" prefWidth="60.0" onAction="#onRectWidthChanged" />
+                    <Label text="Hauteur:" />
+                    <TextField fx:id="rectHeightField" prefWidth="60.0" onAction="#onRectHeightChanged" />
+                </HBox>
+                <!-- Cercle -->
+                <HBox fx:id="circleDimensions" spacing="5.0" visible="false">
+                    <Label text="Rayon:" />
+                    <TextField fx:id="circleRadiusField" prefWidth="60.0" onAction="#onCircleRadiusChanged" />
+                </HBox>
+                <!-- Ellipse -->
+                <HBox fx:id="ellipseDimensions" spacing="5.0" visible="false">
+                    <Label text="Rayon X:" />
+                    <TextField fx:id="ellipseRadiusXField" prefWidth="60.0" onAction="#onEllipseRadiusXChanged" />
+                    <Label text="Rayon Y:" />
+                    <TextField fx:id="ellipseRadiusYField" prefWidth="60.0" onAction="#onEllipseRadiusYChanged" />
+                </HBox>
+                <!-- Ligne -->
+                <HBox fx:id="lineDimensions" spacing="5.0" visible="false">
+                    <Label text="X2:" />
+                    <TextField fx:id="lineEndXField" prefWidth="60.0" onAction="#onLineEndXChanged" />
+                    <Label text="Y2:" />
+                    <TextField fx:id="lineEndYField" prefWidth="60.0" onAction="#onLineEndYChanged" />
+                </HBox>
+                <!-- Triangle (optionnel) -->
+                <HBox fx:id="triangleDimensions" spacing="5.0" visible="false">
+                    <Label text="X2:" />
+                    <TextField fx:id="triangleX2Field" prefWidth="40.0" onAction="#onTriangleX2Changed" />
+                    <Label text="Y2:" />
+                    <TextField fx:id="triangleY2Field" prefWidth="40.0" onAction="#onTriangleY2Changed" />
+                    <Label text="X3:" />
+                    <TextField fx:id="triangleX3Field" prefWidth="40.0" onAction="#onTriangleX3Changed" />
+                    <Label text="Y3:" />
+                    <TextField fx:id="triangleY3Field" prefWidth="40.0" onAction="#onTriangleY3Changed" />
+                </HBox>
+            </VBox>
+
+            <Separator prefWidth="200.0" />
+            
+            <!-- Actions -->
+            <Label text="Actions:" />
+            <Button fx:id="deleteButton" mnemonicParsing="false" onAction="#onDeleteMode" prefWidth="180.0" text="Supprimer" />
+            
+         </children>
+         <padding>
+            <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
+         </padding>
+      </VBox>
+   </left>
+   <center>
+      <ScrollPane fitToHeight="true" fitToWidth="true" BorderPane.alignment="CENTER">
+         <content>
+            <Canvas fx:id="drawingCanvas" height="600.0" width="800.0" />
+         </content>
+      </ScrollPane>
+   </center>
+   <bottom>
+      <HBox alignment="CENTER_LEFT" spacing="10.0" BorderPane.alignment="CENTER">
+         <children>
+            <Label fx:id="statusLabel" text="Prêt" />
+            <Region HBox.hgrow="ALWAYS" />
+            <Label fx:id="coordinatesLabel" text="(0, 0)" />
+         </children>
+         <padding>
+            <Insets bottom="5.0" left="10.0" right="10.0" top="5.0" />
+         </padding>
+      </HBox>
+   </bottom>
+</BorderPane>
